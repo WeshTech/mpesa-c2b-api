@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -10,7 +10,29 @@ export class UsersService {
     return this.prisma.user.create({ data });
   }
 
-  getUsers() {}
+  getUsers() {
+    return this.prisma.user.findMany();
+  }
 
-  getUserById() {}
+  getUserById(id: number) {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  async updateUserById(id: number, data: Prisma.UserUpdateInput) {
+    const findUser = await this.getUserById(id);
+    if (!findUser) throw new HttpException('User Not Found', 404);
+    if (data.username) {
+      const findUser = await this.prisma.user.findUnique({
+        where: { username: data.username as string },
+      });
+      if (findUser) throw new ConflictException('Username already taken!');
+    }
+    return this.prisma.user.update({ where: { id }, data });
+  }
+
+  deleteUserById(id: number) {
+    const findUser = this.getUserById(id);
+    if (!findUser) throw new HttpException('User Not Found', 404);
+    return this.prisma.user.delete({ where: { id } });
+  }
 }
