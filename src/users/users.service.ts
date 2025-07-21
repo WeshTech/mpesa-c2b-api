@@ -7,11 +7,21 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   createUser(data: Prisma.UserCreateInput) {
-    return this.prisma.user.create({ data });
+    return this.prisma.user.create({
+      data: {
+        ...data,
+        userSetting: {
+          create: {
+            smsEnabled: true,
+            notificationsOn: false,
+          },
+        },
+      },
+    });
   }
 
   getUsers() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({ include: { userSetting: true } });
   }
 
   getUserById(id: number) {
@@ -34,5 +44,12 @@ export class UsersService {
     const findUser = this.getUserById(id);
     if (!findUser) throw new HttpException('User Not Found', 404);
     return this.prisma.user.delete({ where: { id } });
+  }
+
+  updateUserSettings(userId: number, data: Prisma.UserSettingUpdateInput) {
+    const findUser = this.getUserById(userId);
+    if (!findUser) throw new HttpException('User Not Found', 404);
+    if (!findUser.userSetting) throw new HttpException('Bad request', 400);
+    return this.prisma.userSetting.update({ where: { userId }, data });
   }
 }

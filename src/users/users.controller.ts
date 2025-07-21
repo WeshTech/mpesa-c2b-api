@@ -12,6 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { updateUserSettingsDto } from './dto/UpdateSettings.dto';
 
 @Controller('users')
 export class UsersController {
@@ -45,5 +46,13 @@ export class UsersController {
   @Delete(':id')
   deleteUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUserById(id);
+  }
+
+  @Patch(':id/settings')
+  updateUserSettingsByUserId(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserSettingsDto: updateUserSettingsDto,
+  ) {
+    return this.usersService.updateUserSettings(id, updateUserSettingsDto);
   }
 }
