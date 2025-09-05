@@ -14,27 +14,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int          @id @default(autoincrement())
-  username    String       @unique
-  displayName String?
-  userSetting UserSetting?
-  posts Post[]
+model Business {
+  id             String   @id @default(uuid())        
+  accountNumber     Int      @unique @default(autoincrement()) 
+  name           String                               
+  description    String?                              
+  email          String?  @unique                     
+  phone          String?                              
+  address        String?                              
+  website        String?                              
+  industry       String?                             
+  registrationNo String? @unique                      
+
+  isActive       Boolean  @default(true)              
+  createdAt      DateTime @default(now())             
+  updatedAt      DateTime @updatedAt                  
 }
 
-model UserSetting {
-  id              Int     @id @default(autoincrement())
-  notificationsOn Boolean
-  smsEnabled      Boolean
-  userId          Int     @unique
-  user            User    @relation(fields: [userId], references: [id])
-}
-
-model Post {
-  id          Int    @id() @default(autoincrement())
-  title       String
-  description String
-  userId Int @unique
-  
-  user User @relation(fields: [userId], references: [id])
-}
