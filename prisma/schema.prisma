@@ -15,19 +15,35 @@ datasource db {
 }
 
 model Business {
-  id             String   @id @default(uuid())        
-  accountNumber     Int      @unique @default(autoincrement()) 
-  name           String                               
-  description    String?                              
-  email          String?  @unique                     
-  phone          String?                              
-  address        String?                              
-  website        String?                              
-  industry       String?                             
-  registrationNo String? @unique                      
+  id             String  @id @default(uuid())
+  accountNumber  Int     @unique @default(autoincrement())
+  name           String
+  description    String?
+  email          String? @unique
+  phone          String?
+  address        String?
+  website        String?
+  industry       String?
+  registrationNo String? @unique
 
-  isActive       Boolean  @default(true)              
-  createdAt      DateTime @default(now())             
-  updatedAt      DateTime @updatedAt                  
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payment Payment[]
 }
 
+model Payment {
+  id              String   @id @default(uuid())
+  transactionId   String   @unique // M-Pesa Transaction ID
+  accountNumber   Int // Business account number
+  amount          Float
+  phone           String // Customer MSISDN
+  payerName       String? // Optional customer name
+  transactionTime DateTime
+
+  createdAt DateTime @default(now())
+
+  // Relation back to Business (optional)
+  business Business @relation(fields: [accountNumber], references: [accountNumber])
+}
